@@ -1,5 +1,7 @@
 #adam tim 028832685
+#luke trinh 028243668
 import socket
+from pymongo import MongoClient
 
 myTCPSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #creates a tcp socket
 while True:

@@ -3,6 +3,11 @@
 import socket
 from pymongo import MongoClient
 
+connectionLink = "mongodb+srv://adamtim2002:121002Tim@dd1.dffgo.mongodb.net/?retryWrites=true&w=majority&appName=DD1"
+client = MongoClient(connectionLink)
+database = client["test"]
+collection1 = database["DD1_virtual"]
+
 myTCPSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #creates a tcp socket
 while True:
     try:

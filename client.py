@@ -1,4 +1,5 @@
-#adam tim 028832685
+# Adam Tim 028832685
+# Luke Trinh 028243668
 import socket
 
 while True:

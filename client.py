@@ -1,11 +1,11 @@
-# Adam Tim 028832685
-# Luke Trinh 028243668
+#adam tim 028832685
+#luke trinh 028243668
 import socket
 
 while True:
     try:
         #gets the server ip and port number
-        serverIP= str(input("enter the server ip address:"))
+        serverIP= str(input("Enter the following numbers that respond to the queries:"))
         serverPort= int(input("enter the server port number:"))
 
         try:

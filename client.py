@@ -5,7 +5,7 @@ import socket
 while True:
     try:
         #gets the server ip and port number
-        serverIP= str(input("Enter the following numbers that respond to the queries:"))
+        serverIP= str(input("Enter the server IP"))
         serverPort= int(input("enter the server port number:"))
 
         try:
@@ -17,7 +17,7 @@ while True:
             while True:
                 #user inputs from one of the queries
                 someData = str(input("Enter a number to enter the following queries:\n1. What is the average moisture inside my kitchen fridge in the past three hours?\n2. What is the average water consumption per cycle in my smart dishwasher?\n3. Which device consumed more electricity among my three IoT devices (two refrigerators and a dishwasher)?"))
-                if someData == "1" and someData == "2" and someData == "3":
+                if someData == "1" or someData == "2" or someData == "3":
                     myTCPSocket.send(bytearray(str(someData), encoding='utf-8'))
                     #client recieves a message back
                     serverResponse = myTCPSocket.recv(1024)

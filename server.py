@@ -72,7 +72,29 @@ while True:
                     results = collection1.aggregate(pipeline2)
                     for result in results:
                         myData = f"The average water consumption per cycle is {result["avgMoisture"]}" 
-                     
+                    if myData == "3":
+                        pipeline3 =[
+                            { "$lookup": {"from": "DD1_metadata" , 
+                                    "localField": "payload.parent_asset_uid", 
+                                    "foreignField": "assetUid", 
+                                    "as": "data"}
+                            },
+                            { "$addFields" : {"name" : "$data.customAttributes.name"}},
+                            {"$unwind": {"path": "$name"}},
+                            {
+                            "$group" : {"_id" : "$name",
+                                        "fridgeEnergy" : {"$sum" : {"$toDouble": "$payload.FridgeAmmeter"}},
+                                        "DishWasherEnergy" : {"$sum" : {"$toDouble": "$payload.Dishwasherammeter"}},
+                                        "Fridge2Energy" : {"$sum" : {"$toDouble": "$sensor 1 2e22eb50-56dc-433b-a25e-7ce35c6fb595"}}
+                                        }
+                            },
+                            { "$addFields" : {"energyConsumption" : {"$add": [{"$toDouble": "$fridgeEnergy"}, {"$toDouble": "$DishWasherEnergy"}, {"$toDouble": "$Fridge2Energy"}]}}},
+                            {"$sort": {"energyConsumption" : -1}},
+                            {"$limit":1}
+                            ]
+                    results = collection1.aggregate(pipeline3)
+                    for result in results:
+                        myData = f"The device with the most energy consumption is {result["_id"]} with {result["energyConsumption"]} amps." 
                     incomingSocket.send(bytearray(str(myData), encoding='utf-8'))
                 except:
                     #connection is closed

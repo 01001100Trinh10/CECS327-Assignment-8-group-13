@@ -37,7 +37,7 @@ while True:
                     #decodes data
                     myData = myData.decode('utf-8')
                     print("message recieved: ", myData)
-                    #changes data to upper case
+                    #query 1
                     if myData == "1":
                         pipeline1 = [
                         { "$lookup": {"from": "DD1_metadata" , 
@@ -59,6 +59,7 @@ while True:
                             myData = f"The average moisture inside the kitchen fridge in the past 3 hours is {moisture}%"  #prints out the results
                     #sends back data to client
                     elif myData == "2":
+                        #query 2
                         pipeline2 = [
                         { "$lookup": {"from": "DD1_metadata" , 
                                     "localField": "payload.parent_asset_uid", 
@@ -76,7 +77,7 @@ while True:
                         for result in results:
                             waterConsumption = result["averageWaterConsumption"] #stores the results in a vairable
                             myData = f"The average water consumption per cycle is {waterConsumption}" #prints out the results
-                    elif myData == "3":
+                    elif myData == "3": #query 3
                         pipeline3 =[
                             { "$lookup": {"from": "DD1_metadata" , 
                                     "localField": "payload.parent_asset_uid", 

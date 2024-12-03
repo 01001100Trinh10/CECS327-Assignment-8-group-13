@@ -35,7 +35,10 @@ while True:
                     myData = myData.decode('utf-8')
                     print("message recieved: ", myData)
                     #changes data to upper case
-                    myData = myData.upper()
+                    if myData == "1":
+                        
+                        
+                    
                     #sends back data to client
                     incomingSocket.send(bytearray(str(myData), encoding='utf-8'))
                 except:

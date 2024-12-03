@@ -41,21 +41,38 @@ while True:
                         { "$lookup": {"from": "DD1_metadata" , 
                         "localField": "payload.parent_asset_uid", 
                         "foreignField": "assetUid", 
-                        "as": "meta"}
+                        "as": "data"}
                         },
-                            {"$match": {"meta.customAttributes.additionalMetadata.location": "kitchen", 
-                                        "meta.customAttributes.name": {"$regex": "Fridge"}, 
-                                        "payload.timestamp": {"$lt": str(time.time()), "$gt": str(time.time() - 10800)}}
-                            },
-                            {"$group": {"_id": "$payload.parent_asset_uid",
-                                        "avgMoisture": {"$avg": {"$toDouble": "$payload.Moisture Meter - FridgeSensor"}}}
-                            }
+                        {"$match": {"data.customAttributes.additionalMetadata.location": "kitchen", 
+                                    "data.customAttributes.name": {"$regex": "Fridge"}, 
+                                    "payload.timestamp": {"$lt": str(time.time()), "$gt": str(time.time() - 10800)}}
+                        },
+                        {"$group": {"_id": "$payload.parent_asset_uid",
+                                    "avgMoisture": {"$avg": {"$toDouble": "$payload.Moisture Meter - FridgeSensor"}}}
+                        }
                         ]
                         results = collection1.aggregate(pipeline1)
                         for result in results:
                             myData = f"The average moisture inside the kitchen fridge in the past 3 hours is {result["avgMoisture"]}%"       
                     #sends back data to client
-
+                    if myData == "2":
+                        pipeline2 = [
+                        { "$lookup": {"from": "DD1_metadata" , 
+                                    "localField": "payload.parent_asset_uid", 
+                                    "foreignField": "assetUid", 
+                                    "as": "data"}
+                                    },
+                        {"$match": {"data.customAttributes.additionalMetadata.location": "kitchen", 
+                                    "data.customAttributes.name": {"$regex": "Dishwasher"} }
+                        },
+                        {"$group": {"_id": "$payload.parent_asset_uid",
+                                    "averageWaterConsumption": {"$avg": {"$toDouble": "$payload.DishwasherWaterConsumptionSensor"}}}
+                        }
+                    ]
+                    results = collection1.aggregate(pipeline2)
+                    for result in results:
+                        myData = f"The average water consumption per cycle is {result["avgMoisture"]}" 
+                     
                     incomingSocket.send(bytearray(str(myData), encoding='utf-8'))
                 except:
                     #connection is closed

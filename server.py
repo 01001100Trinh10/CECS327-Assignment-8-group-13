@@ -50,14 +50,15 @@ while True:
                                     "payload.timestamp": {"$lt": str(time.time()), "$gt": str(time.time() - 10800)}}
                         },
                         {"$group": {"_id": "$payload.parent_asset_uid",
-                                    "avgMoisture": {"$avg": {"$toDouble": "$payload.Moisture Meter - FridgeSensor"}}}
+                                    "averageMoisture": {"$avg": {"$toDouble": "$payload.Moisture Meter - FridgeSensor"}}}
                         }
                         ]
                         results = collection1.aggregate(pipeline1)
                         for result in results:
-                            myData = f"The average moisture inside the kitchen fridge in the past 3 hours is {result["avgMoisture"]}%"       
+                            moisture = result["averageMoisture"]
+                            myData = f"The average moisture inside the kitchen fridge in the past 3 hours is {moisture}%"       
                     #sends back data to client
-                    if myData == "2":
+                    elif myData == "2":
                         pipeline2 = [
                         { "$lookup": {"from": "DD1_metadata" , 
                                     "localField": "payload.parent_asset_uid", 
@@ -71,10 +72,11 @@ while True:
                                     "averageWaterConsumption": {"$avg": {"$toDouble": "$payload.DishwasherWaterConsumptionSensor"}}}
                         }
                     ]
-                    results = collection1.aggregate(pipeline2)
-                    for result in results:
-                        myData = f"The average water consumption per cycle is {result["avgMoisture"]}" 
-                    if myData == "3":
+                        results = collection1.aggregate(pipeline2)
+                        for result in results:
+                            waterConsumption = result["averageWaterConsumption"]
+                            myData = f"The average water consumption per cycle is {waterConsumption}" 
+                    elif myData == "3":
                         pipeline3 =[
                             { "$lookup": {"from": "DD1_metadata" , 
                                     "localField": "payload.parent_asset_uid", 
@@ -94,9 +96,11 @@ while True:
                             {"$sort": {"energyConsumption" : -1}},
                             {"$limit":1}
                             ]
-                    results = collection1.aggregate(pipeline3)
-                    for result in results:
-                        myData = f"The device with the most energy consumption is {result["_id"]} with {result["energyConsumption"]} amps." 
+                        results = collection1.aggregate(pipeline3)
+                        for result in results:
+                            identity = result["_id"]
+                            energyConsumption = result["energyConsumption"]
+                            myData = f"The device with the most energy consumption is {identity} with {energyConsumption} amps." 
                     incomingSocket.send(bytearray(str(myData), encoding='utf-8'))
                 except:
                     #connection is closed

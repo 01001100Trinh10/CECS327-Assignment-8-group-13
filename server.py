@@ -37,7 +37,7 @@ while True:
                     #decodes data
                     myData = myData.decode('utf-8')
                     print("message recieved: ", myData)
-                    #changes data to upper case
+                    #query 1
                     if myData == "1":
                         pipeline1 = [
                         { "$lookup": {"from": "DD1_metadata" , 
@@ -57,7 +57,7 @@ while True:
                         for result in results:
                             moisture = result["averageMoisture"]
                             myData = f"The average moisture inside the kitchen fridge in the past 3 hours is {moisture}%"       
-                    #sends back data to client
+                    #query 2
                     elif myData == "2":
                         pipeline2 = [
                         { "$lookup": {"from": "DD1_metadata" , 
@@ -76,6 +76,7 @@ while True:
                         for result in results:
                             waterConsumption = result["averageWaterConsumption"]
                             myData = f"The average water consumption per cycle is {waterConsumption}" 
+                    #query 3
                     elif myData == "3":
                         pipeline3 =[
                             { "$lookup": {"from": "DD1_metadata" , 
@@ -101,6 +102,7 @@ while True:
                             identity = result["_id"]
                             energyConsumption = result["energyConsumption"]
                             myData = f"The device with the most energy consumption is {identity} with {energyConsumption} amps." 
+                    #sends back data
                     incomingSocket.send(bytearray(str(myData), encoding='utf-8'))
                 except:
                     #connection is closed

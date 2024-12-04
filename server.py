@@ -75,7 +75,7 @@ while True:
                         results = collection1.aggregate(pipeline2)
                         for result in results:
                             waterConsumption = result["averageWaterConsumption"] #stores the results in a vairable
-                            myData = f"The average water consumption per cycle is {waterConsumption}" #prints out the results
+                            myData = f"The average water consumption per cycle is {waterConsumption} gallons" #prints out the results
                     elif myData == "3": #query 3
                         pipeline3 =[
                             { "$lookup": {"from": "DD1_metadata" , 

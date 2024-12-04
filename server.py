@@ -44,65 +44,65 @@ while True:
                         "localField": "payload.parent_asset_uid", 
                         "foreignField": "assetUid", 
                         "as": "data"}
-                        },
+                        }, #performs a join operation between the collection and the DD!_metadata collection
                         {"$match": {"data.customAttributes.additionalMetadata.location": "kitchen", 
                                     "data.customAttributes.name": {"$regex": "Fridge"}, 
                                     "payload.timestamp": {"$lt": str(time.time()), "$gt": str(time.time() - 10800)}}
-                        },
+                        }, #filters the data based on the objects location, name and is within the last 3 hours
                         {"$group": {"_id": "$payload.parent_asset_uid",
                                     "averageMoisture": {"$avg": {"$toDouble": "$payload.Moisture Meter - FridgeSensor"}}}
-                        }
+                        } #groups the data by the average moisture of the device
                         ]
                         results = collection1.aggregate(pipeline1)
                         for result in results:
-                            moisture = result["averageMoisture"]
-                            myData = f"The average moisture inside the kitchen fridge in the past 3 hours is {moisture}%"       
-                    #query 2
+                            moisture = result["averageMoisture"] #stores the results in a vairable
+                            myData = f"The average moisture inside the kitchen fridge in the past 3 hours is {moisture}%"  #prints out the results
+                    #sends back data to client
                     elif myData == "2":
+                        #query 2
                         pipeline2 = [
                         { "$lookup": {"from": "DD1_metadata" , 
                                     "localField": "payload.parent_asset_uid", 
                                     "foreignField": "assetUid", 
                                     "as": "data"}
-                                    },
+                                    }, #performs a join operation between the collection and the DD!_metadata collection
                         {"$match": {"data.customAttributes.additionalMetadata.location": "kitchen", 
                                     "data.customAttributes.name": {"$regex": "Dishwasher"} }
-                        },
+                        },#filters the data based on the objects location and name
                         {"$group": {"_id": "$payload.parent_asset_uid",
                                     "averageWaterConsumption": {"$avg": {"$toDouble": "$payload.DishwasherWaterConsumptionSensor"}}}
-                        }
+                        } #groups the data by the average water consumption of the device
                     ]
                         results = collection1.aggregate(pipeline2)
                         for result in results:
-                            waterConsumption = result["averageWaterConsumption"]
-                            myData = f"The average water consumption per cycle is {waterConsumption}" 
-                    #query 3
-                    elif myData == "3":
+                            waterConsumption = result["averageWaterConsumption"] #stores the results in a vairable
+                            myData = f"The average water consumption per cycle is {waterConsumption}" #prints out the results
+                    elif myData == "3": #query 3
                         pipeline3 =[
                             { "$lookup": {"from": "DD1_metadata" , 
                                     "localField": "payload.parent_asset_uid", 
                                     "foreignField": "assetUid", 
                                     "as": "data"}
-                            },
-                            { "$addFields" : {"name" : "$data.customAttributes.name"}},
-                            {"$unwind": {"path": "$name"}},
+                            }, #performs a join operation between the collection and the DD!_metadata collection
+                            { "$addFields" : {"name" : "$data.customAttributes.name"}}, #adds the field name
+                            {"$unwind": {"path": "$name"}}, #unwinds the name array
                             {
                             "$group" : {"_id" : "$name",
                                         "fridgeEnergy" : {"$sum" : {"$toDouble": "$payload.FridgeAmmeter"}},
                                         "DishWasherEnergy" : {"$sum" : {"$toDouble": "$payload.Dishwasherammeter"}},
                                         "Fridge2Energy" : {"$sum" : {"$toDouble": "$sensor 1 2e22eb50-56dc-433b-a25e-7ce35c6fb595"}}
-                                        }
-                            },
+                                        } 
+                            }, # groups the fields by the total amount of energy they cnsume
                             { "$addFields" : {"energyConsumption" : {"$add": [{"$toDouble": "$fridgeEnergy"}, {"$toDouble": "$DishWasherEnergy"}, {"$toDouble": "$Fridge2Energy"}]}}},
-                            {"$sort": {"energyConsumption" : -1}},
-                            {"$limit":1}
+                            #create an energy consumption field to create the list of energy consumption per device
+                            {"$sort": {"energyConsumption" : -1}}, #sorts the consumption fields by greatest to least
+                            {"$limit":1} #gets the device with the greatest energy consumption
                             ]
-                        results = collection1.aggregate(pipeline3)
+                        results = collection1.aggregate(pipeline3) #gets the results of the pipeline
                         for result in results:
-                            identity = result["_id"]
+                            identity = result["_id"] #stores the results in a vairable
                             energyConsumption = result["energyConsumption"]
-                            myData = f"The device with the most energy consumption is {identity} with {energyConsumption} amps." 
-                    #sends back data
+                            myData = f"The device with the most energy consumption is {identity} with {energyConsumption} amps." #prints out the results
                     incomingSocket.send(bytearray(str(myData), encoding='utf-8'))
                 except:
                     #connection is closed

@@ -21,7 +21,6 @@ while True:
                     myTCPSocket.send(bytearray(str(someData), encoding='utf-8'))
                     #client recieves a message back
                     serverResponse = myTCPSocket.recv(1024)
-
                     print(serverResponse.decode('utf-8'))
                     #allows the user to send multiple queries
                     condition = input("do you want to exit, type y/n: ")

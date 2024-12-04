@@ -8,8 +8,8 @@ from pymongo import MongoClient
 
 myTCPSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #creates a tcp socket
 connectionLink = "mongodb+srv://adamtim2002:121002Tim@dd1.dffgo.mongodb.net/?retryWrites=true&w=majority&appName=DD1"
-client = MongoClient(connectionLink)
-database = client["test"]
+client = MongoClient(connectionLink)#connects to mongoDB database
+database = client["test"]#loads database
 collection1 = database["DD1_virtual"]
 
 while True:
@@ -37,14 +37,14 @@ while True:
                     #decodes data
                     myData = myData.decode('utf-8')
                     print("message recieved: ", myData)
-                    #query 1
                     if myData == "1":
+                        #query 1 - fetches the average moisture in the kitchen fridge
                         pipeline1 = [
                         { "$lookup": {"from": "DD1_metadata" , 
                         "localField": "payload.parent_asset_uid", 
                         "foreignField": "assetUid", 
                         "as": "data"}
-                        }, #performs a join operation between the collection and the DD!_metadata collection
+                        }, #performs a join operation between the collection and the DD1_metadata collection
                         {"$match": {"data.customAttributes.additionalMetadata.location": "kitchen", 
                                     "data.customAttributes.name": {"$regex": "Fridge"}, 
                                     "payload.timestamp": {"$lt": str(time.time()), "$gt": str(time.time() - 10800)}}
@@ -57,27 +57,27 @@ while True:
                         for result in results:
                             moisture = result["averageMoisture"] #stores the results in a vairable
                             myData = f"The average moisture inside the kitchen fridge in the past 3 hours is {moisture}%"  #prints out the results
-                    #sends back data to client
                     elif myData == "2":
-                        #query 2
+                        #query 2 - finds average water consumption per cycle for the wash machine
                         pipeline2 = [
                         { "$lookup": {"from": "DD1_metadata" , 
                                     "localField": "payload.parent_asset_uid", 
                                     "foreignField": "assetUid", 
                                     "as": "data"}
-                                    }, #performs a join operation between the collection and the DD!_metadata collection
+                                    }, #performs a join operation between the collection and the DD1_metadata collection
                         {"$match": {"data.customAttributes.additionalMetadata.location": "kitchen", 
                                     "data.customAttributes.name": {"$regex": "Dishwasher"} }
                         },#filters the data based on the objects location and name
                         {"$group": {"_id": "$payload.parent_asset_uid",
                                     "averageWaterConsumption": {"$avg": {"$toDouble": "$payload.DishwasherWaterConsumptionSensor"}}}
                         } #groups the data by the average water consumption of the device
-                    ]
+                        ]
                         results = collection1.aggregate(pipeline2)
                         for result in results:
                             waterConsumption = result["averageWaterConsumption"] #stores the results in a vairable
                             myData = f"The average water consumption per cycle is {waterConsumption}" #prints out the results
-                    elif myData == "3": #query 3
+                    elif myData == "3":
+                        #query 3 - returns one of the three IoT devices that consumed the most electricity
                         pipeline3 =[
                             { "$lookup": {"from": "DD1_metadata" , 
                                     "localField": "payload.parent_asset_uid", 

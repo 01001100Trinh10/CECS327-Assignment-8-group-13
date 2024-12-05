@@ -24,7 +24,7 @@ Things you to run an end-to-end IoT system:
 
 **Google Cloud Setup**
 
-In this lab, we had two distinct virtual machines(VMs) running in Google Cloud. One VM will represent the client that communicates with the server and the other VM will represent the server that fetches data from MongoDB from a set of pre-coded queries. (TALK ABOUT IPs)
+In this lab, we had two distinct virtual machines(VMs) running in Google Cloud. One VM will represent the client that communicates with the server and the other VM will represent the server that fetches data from MongoDB from a set of pre-coded queries.
 
 **Dataniz Setup**
 

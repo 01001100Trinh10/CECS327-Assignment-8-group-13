@@ -22,7 +22,7 @@ while True:
                     #client recveis a message back
                     serverResponse = myTCPSocket.recv(1024)
                     print(serverResponse.decode('utf-8'))
-                if someData == "4":
+                elif someData == "4":
                     break
                 #sends a user-friendly message in case the user enters the wrong value
                 else:
